@@ -1,4 +1,15 @@
+# Python
 __pycache__/
+*.pyc
+
+# Binaries
+minikube-linux-amd64
+
+# Office temp files
+~$*
+
+# Docs (если не нужны)
+*.docx__pycache__/
 *.pyc
 minikube-linux-amd64
 screenshots/*.tmp
