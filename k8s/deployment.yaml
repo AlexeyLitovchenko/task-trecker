@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+# версия API Kubernetes
+kind: Deployment
+# указывает тип ресурса для управления репликами подов, поддерживает состояние подов
+metadata:
+  name: task-tracker-deployment
+spec:
+  replicas: 3
+  # указание количества подов в кластере, это число будет поддерживаться автоматически
+  selector:
+    matchLabels:
+      app: task-tracker
+      # только поды с меткой task-tracker будут поддерживаться
+  template:
+  # шаблон пода
+    metadata:
+      labels:
+        app: task-tracker
+    spec:
+      containers:
+        - name: task-tracker
+          # имя контейнера внутри пода
+          image: task-trecker:v1
+          # докер образ приложения, загруженный в minikube, используется ЛОКАЛЬНЫЙ ОБРАЗ!
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              # порт приложения внутри контейнера
+          resources:
+          # минимальные и максимальные ресурсы системы, выделенные для приложения
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              # endpoint для проверки готовности приложения
+              port: 8080
+            initialDelaySeconds: 3
+            # время на запуск приложения
+            periodSeconds: 5
+            # частота выполнения проверки
+            timeoutSeconds: 2
+            failureThreshold: 3
+            # после трех запросов без ответа, под не получает трафик и считается сломанным
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+            # после трех проверок kubernetes перезапускает контейнер с приложением
